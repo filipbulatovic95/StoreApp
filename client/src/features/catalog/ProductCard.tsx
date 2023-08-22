@@ -16,7 +16,7 @@ interface Props {
 }
 
 export default function ProductList({ product }: Props) {
-
+ 
   
   return (
     <Card sx={{ maxWidth: 345 }}>
@@ -27,7 +27,7 @@ export default function ProductList({ product }: Props) {
       />
       <CardMedia
       sx={{height: 140, backgroundSize: 'contain', bgcolor: 'primary.light'}}
-      src={product.pictureUrl}
+      image={product.pictureUrl}
       title={product.name}
       />
       <CardContent>
