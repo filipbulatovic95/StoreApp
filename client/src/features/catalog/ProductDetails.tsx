@@ -11,13 +11,12 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Product } from "../../app/layout/models/product";
-import agent from "../../app/api/agent";
 import NotFound from "../../app/api/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
 import { LoadingButton } from "@mui/lab";
 import { useAppDispatch, useAppSelector } from "../../app/store/ConfigureStore";
 import { addBasketitemAsync, removeBasketItemAsync } from "../basket/BasketSlice";
+import { fetchProductAsync, productSelectors } from "./CatalogSlice";
 
 // interface Props{
 
@@ -27,19 +26,16 @@ export default function ProductDetails() {
   const { basket, status} = useAppSelector(state => state.basket);
   const dispatch = useAppDispatch();
   const { id } = useParams();
-  const [product, setProduct] = useState<Product | null>(null);
+  const product = useAppSelector(state => productSelectors.selectById(state, id!));
+  const {status: productStatus} = useAppSelector(state => state.catalog);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(0);
   const item = basket?.items.find((i) => i.productId === product?.id);
 
   useEffect(() => {
     if (item) setQuantity(item.quantity);
-    id &&
-      agent.Catalog.details(parseInt(id))
-        .then((response) => setProduct(response))
-        .catch((error) => console.log(error))
-        .finally(() => setLoading(false));
-  }, [id,item]);
+    if (!product && id) dispatch(fetchProductAsync(parseInt(id)));
+  }, [id,item, dispatch, product]);
 
   function handleinputChange(event: any) {
     if(event.target.value >= 0 ){
@@ -58,7 +54,7 @@ export default function ProductDetails() {
     }
   }
 
-  if (loading) return <LoadingComponent message="Loading product..." />;
+  if (productStatus.includes('pending')) return <LoadingComponent message="Loading product..." />;
 
   if (!product) return <NotFound />;
   return (
@@ -116,7 +112,7 @@ export default function ProductDetails() {
           <Grid item xs={6} >
           <LoadingButton
           disabled={item?.quantity === quantity || !item && quantity === 0}
-            loading={status.includes('pending' + item?.productId)}
+            loading={status.includes('pending')}
             onClick={handleUpdateCart}
             sx={{ height: "55px" }}
             color="primary"
