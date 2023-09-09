@@ -1,41 +1,81 @@
-import { Grid, Table, TableBody, TableCell, TableContainer, TableRow, Typography, Divider } from "@mui/material";
-import axios from "axios";
+import {
+  Grid,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  Typography,
+  Divider,
+  TextField,
+} from "@mui/material";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Product } from "../../app/layout/models/product";
 import agent from "../../app/api/agent";
 import NotFound from "../../app/api/errors/NotFound";
 import LoadingComponent from "../../app/layout/LoadingComponent";
+import { LoadingButton } from "@mui/lab";
+import { useAppDispatch, useAppSelector } from "../../app/store/ConfigureStore";
+import { addBasketitemAsync, removeBasketItemAsync } from "../basket/BasketSlice";
 
 // interface Props{
 
 // }
 
 export default function ProductDetails() {
-
-  const {id} = useParams();
+  const { basket, status} = useAppSelector(state => state.basket);
+  const dispatch = useAppDispatch();
+  const { id } = useParams();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(0);
+  const item = basket?.items.find((i) => i.productId === product?.id);
 
-  useEffect(()=>{
-    id && agent.Catalog.details(parseInt(id))
-    .then(response =>setProduct(response))
-    .catch(error => console.log(error))
-    .finally(() => setLoading(false))
-  },[id])
+  useEffect(() => {
+    if (item) setQuantity(item.quantity);
+    id &&
+      agent.Catalog.details(parseInt(id))
+        .then((response) => setProduct(response))
+        .catch((error) => console.log(error))
+        .finally(() => setLoading(false));
+  }, [id,item]);
 
-  if(loading) return <LoadingComponent message='Loading product...' />
+  function handleinputChange(event: any) {
+    if(event.target.value >= 0 ){
+      setQuantity(event.target.value);
 
-  if(!product) return <NotFound />
+    }
+  }
+  function handleUpdateCart() {
+    if (!item || quantity > item.quantity) {
+      const updatedQuantity = item ? quantity - item.quantity : quantity;
+       dispatch(addBasketitemAsync({productId: product?.id! , quantity: updatedQuantity}))
+    }else{
+     const updatedQuantity = item.quantity - quantity;
+     dispatch(removeBasketItemAsync({productId: product?.id! , quantity: updatedQuantity}))
+
+    }
+  }
+
+  if (loading) return <LoadingComponent message="Loading product..." />;
+
+  if (!product) return <NotFound />;
   return (
     <Grid container spacing={6}>
-      <Grid item xs={6}> 
-       <img src={product.pictureUrl} alt={product.name} style={{width: '100%'}}/>
+      <Grid item xs={6}>
+        <img
+          src={product.pictureUrl}
+          alt={product.name}
+          style={{ width: "100%" }}
+        />
       </Grid>
       <Grid item xs={6}>
-        <Typography variant="h3" >{product.name}</Typography>
-        <Divider sx={{mb: 2}}/>
-        <Typography variant="h4" color='secondary'>${(product.price / 100).toFixed(2)}</Typography>
+        <Typography variant="h3">{product.name}</Typography>
+        <Divider sx={{ mb: 2 }} />
+        <Typography variant="h4" color="secondary">
+          ${(product.price / 100).toFixed(2)}
+        </Typography>
         <TableContainer>
           <Table>
             <TableBody>
@@ -62,8 +102,33 @@ export default function ProductDetails() {
             </TableBody>
           </Table>
         </TableContainer>
+        <Grid container  spacing={2}>
+          <Grid item xs={6}>
+            <TextField
+            onChange={handleinputChange}
+              variant="outlined"
+              type="number"
+              label="Quantity in Cart"
+              fullWidth
+              value={quantity}
+            />
+          </Grid>
+          <Grid item xs={6} >
+          <LoadingButton
+          disabled={item?.quantity === quantity || !item && quantity === 0}
+            loading={status.includes('pending' + item?.productId)}
+            onClick={handleUpdateCart}
+            sx={{ height: "55px" }}
+            color="primary"
+            size="large"
+            variant="contained"
+            fullWidth
+          >
+            {item ? "Update Quantity" : "Add to cart"}
+          </LoadingButton>
+          </Grid>
+        </Grid>
       </Grid>
-
     </Grid>
-  )    
+  );
 }

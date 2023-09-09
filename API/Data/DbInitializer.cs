@@ -6,8 +6,8 @@ namespace API.Data
     {
         public static void Initialize(StoreContext context)
         {
-            if(context.Products.Any()) return;
-            
+            if (context.Products.Any()) return;
+
             var products = new List<Product>
             {
                 new Product
@@ -207,14 +207,11 @@ namespace API.Data
                     QuantityInStock = 100
                 },
             };
-
-            //2 ways to insert products
-            context.Products.AddRange(products);
-
-            // foreach(var product in products)
-            // {
-            //     context.Products.Add(product);
-            // }
+            
+            foreach (var product in products)
+            {
+                context.Products.Add(product);
+            }
 
             context.SaveChanges();
         }

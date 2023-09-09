@@ -10,7 +10,7 @@ interface Props{
 
 export default function ProductList({products} : Props){
 
-
+console.log(products);
     return (
         <Grid container spacing={4}>
         {products.map(product => ( 
