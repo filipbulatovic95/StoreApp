@@ -15,10 +15,10 @@ namespace API.Controllers
             _context = context;
         }
 
-        [HttpGet]
+        [HttpGet("getAll")]
         public async Task<ActionResult<List<Product>>> GetProducts()
         {
-            return  await _context.Products.ToListAsync();
+            return await _context.Products.ToListAsync();
         }
 
         [HttpGet("{id}")]
