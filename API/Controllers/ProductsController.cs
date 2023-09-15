@@ -24,7 +24,7 @@ namespace API.Controllers
         {
             var product = await _context.Products.FindAsync(id);
 
-            if(product == null) return NotFound();
+            if (product == null) return NotFound();
 
             return product;
         }
