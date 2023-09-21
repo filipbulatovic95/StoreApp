@@ -8,7 +8,7 @@ import {
   Typography,
   CardHeader,
 } from "@mui/material";
-import { Product } from "../../app/layout/models/product";
+import { Product } from "../../app/models/product";
 import { Link } from "react-router-dom";
 import agent from "../../app/api/agent";
 import { useState } from "react";
