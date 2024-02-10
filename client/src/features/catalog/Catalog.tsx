@@ -14,7 +14,7 @@ const sortOptions = [
   {value: 'priceDesc', label: 'Price - High to low'},
   {value: 'price', label: 'price - Low to high'},
 ]
-
+ 
 
 export default function Catalog(){
     const products = useAppSelector(productSelectors.selectAll);

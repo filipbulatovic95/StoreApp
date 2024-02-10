@@ -16,9 +16,9 @@ import RequireAuth from "./RequireAuth";
 export const router = createBrowserRouter([
     {
         path: '/',
-        element: <App />,
+        element: <App />,   
         children: [
-            {element: <RequireAuth />, children: [
+            {element: <RequireAuth />, children: [ 
                 {path: 'checkout', element: <CheckoutPage />},
             ]},
             {path: '', element: <HomePage />},

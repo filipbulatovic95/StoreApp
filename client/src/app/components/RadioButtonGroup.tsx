@@ -14,7 +14,7 @@ export default function RadioButtonGroup({options, onChange, selectedValue}: Pro
             <FormControlLabel
               value={value}
               control={<Radio />}
-              label={label}
+              label={label} 
               key={value}
             />
           ))}
